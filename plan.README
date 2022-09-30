@@ -4,6 +4,9 @@ get the assembler a proper launch interface argparse etc
 execute some assembled binary with the virtual machine
 
 --- you are here   ---
+
 confirm it works by drawing a circle or something
 try making an asm that composes using s expressions
 then bring in the python lisp processor for macros
+    run the lisp processor on the asm to get a binary.
+    follow through with knowables and unknowables at compile time to get macros and constant folding

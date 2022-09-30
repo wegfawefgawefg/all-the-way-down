@@ -52,22 +52,3 @@
         (jmp ,(add -4 (length (compile body))))
     )
 )
-
-
-; example of integer vector type
-(defmacro make-vec (t)
-    '(defstruct vec (type ,t) (size 3) (data (make-array size)))
-)
-
-; example use
-(make-vec int)
-
-; example of vector addition function
-(defn vec-add (a b)
-    (let ((c (make-vec)))
-        (for (i 0 (vec-size a) 1)
-            (set (vec-ref c i) (+ (vec-ref a i) (vec-ref b i)))
-        )
-        c
-    )
-)
