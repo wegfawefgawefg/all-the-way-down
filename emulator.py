@@ -57,9 +57,11 @@
 '''
 
 
+import argparse
 from cmath import inf
 import os
 import random
+import sys
 from turtle import delay
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
@@ -158,16 +160,17 @@ class Emu:
         LOG.info("reset")
         self._disp_clear()
 
+        self.op = 0x00
         # self.key_inputs = [0] * 16
-        self.memory = [0]*Emu.MEMORY_SIZE﻿
-        # self.pc = 0x0200 #512 cant be set until after program load
+        self.memory = [0]*Emu.MEMORY_SIZE
+        self.pc = 0x0200 #512 cant be set until after program load
 
         self.compare_flag = False
         self.carry = 0
         self.address_low = 0x00
         self.address_high = 0x00
 
-        self.registers = []*16
+        self.registers = [0x00]*16
         self.sound_timer = 0
         self.delay_timer = 0
         self.should_draw = False
@@ -271,30 +274,31 @@ class Emu:
         key_dump = "\t\t\n ".join(key_dump)
         LOG.info(f"======== keys: [{key_dump}]") if CYCLE_LOGGING else None 
 
+    def inc_pc(self):
+        self.pc += 3
+
     def cycle(self):
         LOG.info("========================= cycle ================================") if CYCLE_LOGGING else None 
         if self.pc >= Emu.MEMORY_SIZE:
             LOG.error("program counter exceeded program memory") if CYCLE_LOGGING else None 
             quit()
 
-        instruction = self.memory[self.pc]
+        self.op = self.memory[self.pc]
+        self.vx = self.memory[self.pc + 1]
+        self.vy = self.memory[self.pc + 2]
         if self.print_loaded_ops:
             LOG.info(f"======== pc: {fbhs(self.pc)}") if CYCLE_LOGGING else None 
             self.print_registers() if CYCLE_LOGGING else None 
-            self.print_stack() if CYCLE_LOGGING else None 
-            self.print_keys() if CYCLE_LOGGING else None
-            LOG.info(f"======== current op: {fbhs(self.op)}") if CYCLE_LOGGING else None 
-        op = instruction & 0xff0000
+            # self.print_stack() if CYCLE_LOGGING else None 
+            # self.print_keys() if CYCLE_LOGGING else None
+            LOG.info(f"======== current op: {fbhs(self.op)}") if CYCLE_LOGGING else None
         try:
-            self.isa[op](instruction)
+            self.isa[self.op]()
         except:
-            LOG.error(f"invalid instruction: 0x{op:02x}")
+            LOG.error(f"invalid instruction: 0x{self.op:02x}")
             quit()
         self.inc_pc()
 
-        # x = (instruction & 0x0f0) >> 4
-        # y = (instruction & 0x00f)
-        
         self.delay_timer = max(0, self.delay_timer - 1)
         self.sound_timer = max(0, self.sound_timer - 1)
         if self.sound_timer > 0:
@@ -329,18 +333,6 @@ class Emu:
                 LOG.info(f"key pressed: {pygame.key.name(event.key)}")
                 key_mem_address = self.key_map[event.key]
                 self.key_inputs[key_mem_address] = 1
-
-    @property
-    def vx(self):
-        return (self.op & 0x00ff00) >> 8
-
-    @property
-    def vy(self):
-        return (self.op & 0x0000ff)
-
-    @property
-    def vxy(self):
-        return (self.op & 0x00ffff)
 
     # _move
     def _move(self):
@@ -536,9 +528,13 @@ class Emu:
 
     # _call
     # left unimplemented for now as can be done in software
+    def _call(self):
+        pass
 
     # _ret
     # left unimplemented for now as can be done in software
+    def _ret(self):
+        pass
 
     # _nop
     def _nop(self):
@@ -556,6 +552,11 @@ class Emu:
         self.should_draw = True
 
 def main():
+    parser = argparse.ArgumentParser(description='Convert assembly code to machine code')
+    parser.add_argument('file', nargs='?', default=sys.argv[1], help='input file')
+    parser.add_argument('--no-keys', dest='keys', action='store_false', help='disable key input')
+    args = parser.parse_args()
+
     pygame.init()
     screen_dims = Vector2(64, 32)
     window_dims = screen_dims * 16.0
@@ -563,7 +564,7 @@ def main():
     window = pygame.display.set_mode(window_dims)
 
     emu = Emu()
-    emu.load_rom("test.bin")
+    emu.load_rom(args.file)
 
     dt = 1.0 / 60.0
     time = pygame.time.get_ticks()
@@ -581,8 +582,9 @@ def main():
                     running = False
                     break
                 else:
-                    if event.type in [pygame.KEYUP, pygame.KEYDOWN]:
-                        emu.handle_input_event(event)
+                    if args.keys:
+                        if event.type in [pygame.KEYUP, pygame.KEYDOWN]:
+                            emu.handle_input_event(event)
                     
         if running == False:
             break

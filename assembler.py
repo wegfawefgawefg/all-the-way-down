@@ -4,6 +4,7 @@ Converts file of assembly code to file of virtual machine code
 
 import sys
 import argparse
+from pprint import pprint
 
 from isa import isa_inv
 
@@ -24,7 +25,7 @@ for line in lines:
     if line.startswith(';') or line == '':  #   comments
         continue
     if ';' in line: #   remove trailing comments
-        line = line.split(';')[0]
+        line = line.split(';')[0].strip()
     parts = line.split(' ')
 
     #   build instruction

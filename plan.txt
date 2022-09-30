@@ -1,7 +1,9 @@
-first get an emulator up that loads binaries. 
+first get an emulator up that loads binaries
+make a basic assembler to help with test programs
+get the assembler a proper launch interface argparse etc
+execute some assembled binary with the virtual machine
+
+--- you are here   ---
 confirm it works by drawing a circle or something
-get it a proper launch interface argparse etc
-
 try making an asm that composes using s expressions
-
-then bring in the python lisp processor
+then bring in the python lisp processor for macros
