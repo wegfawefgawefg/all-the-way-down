@@ -1,0 +1,48 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;            ISA                 ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; all instructions are 3 bytes
+; instruction, arg, arg
+
+;;;;;;;;    moving data around
+;   move        dest        src
+;   loadk       regnum      const
+;   sloada      addr-high   addr-low
+;   load        regnum
+;   store       regnum
+
+;;;;;;;;    register math       
+;   add         regnum      regnum
+;   sub         regnum      regnum
+;   neg         regnum      regnum
+;   mul         regnum      regnum
+;   div         regnum      regnum
+;   mod         regnum      regnum
+;   rshift      regnum      
+;   lshift      regnum
+;   and         regnum      regnum
+;   or          regnum      regnum
+;   xor         regnum      regnum
+;   xand        regnum      regnum
+
+;;;;;;;;    comparators
+;   eq          regnum      regnum  ;  set flag
+;   neq         regnum      regnum  ;  set flag
+;   lt          regnum      regnum  ;  set flag
+;   gt          regnum      regnum  ;  set flag
+;   lte         regnum      regnum  ;  set flag
+;   gte         regnum      regnum  ;  set flag
+
+;;;;;;;;    control flow
+; all jumps are only 7 bits, the first bit is the sign bit, max distance is 128; gonna be a lot of jumpin goin on
+
+;   ijf                 ;   invert the jump flag bit
+;   jmp         addr    ;   unconditional relative jump
+;   cjmp        addr    ;   if flag is set
+
+;   call        addr    ;   copies all registers to stack, adds pc to stack, jumps to addr
+;   ret                 ;   pops pc from stack, pops all registers from stack, jumps to pc
+
+;;;;;;;;    misc
+;   nop
+;   halt

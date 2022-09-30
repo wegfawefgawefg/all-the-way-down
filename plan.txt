@@ -1,0 +1,7 @@
+first get an emulator up that loads binaries. 
+confirm it works by drawing a circle or something
+get it a proper launch interface argparse etc
+
+try making an asm that composes using s expressions
+
+then bring in the python lisp processor
